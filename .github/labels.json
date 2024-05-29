@@ -43,16 +43,6 @@
     "name": "skip-changelog",
     "color": "f9bf45",
     "description": "Exclude from release changelog"
-  },
-  {
-    "name": "shared",
-    "color": "bdc0ba",
-    "description": "New feature or bug fix of shared package"
-  },
-  {
-    "name": "service:holidays",
-    "color": "bc002d",
-    "description": "New feature or bug fix of holidays service"
   }
 ]
 
