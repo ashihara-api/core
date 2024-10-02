@@ -7,11 +7,6 @@ import (
 	"net/http"
 )
 
-const (
-	// ServiceDomainGlobal ...
-	ServiceDomainGlobal = "ashihara"
-)
-
 // Status
 const (
 	// StatusBadRequest ...
@@ -57,9 +52,6 @@ const (
 )
 
 var (
-	// ServiceDomain is default service domain name
-	ServiceDomain = ServiceDomainGlobal
-
 	// CaseBadRequest ...
 	CaseBadRequest = ErrCase{
 		Code:   http.StatusBadRequest,
@@ -127,7 +119,6 @@ var (
 // Cause ...
 type Cause struct {
 	code    int
-	domain  string
 	status  string
 	message error
 	details []Detail
@@ -135,7 +126,6 @@ type Cause struct {
 
 // Detail ...
 type Detail struct {
-	Domain  string
 	Reason  string
 	Message string
 }
@@ -155,27 +145,24 @@ type jsonResponse struct {
 // jsonResponseElement
 type jsonResponseElement struct {
 	Code    int      `json:"code"`
-	Domain  string   `json:"domain"`
 	Status  string   `json:"status"`
 	Message string   `json:"message"`
 	Details []Detail `json:"details"`
 }
 
 // NewCause ...
-func NewCause(err error, domain string, c ErrCase) error {
-	return NewCauseWithStatus(err, domain, c.Code, c.Status, c.Reason)
+func NewCause(err error, c ErrCase) error {
+	return NewCauseWithStatus(err, c.Code, c.Status, c.Reason)
 }
 
 // NewCauseWithStatus ...
-func NewCauseWithStatus(err error, domain string, code int, status string, reason string) error {
+func NewCauseWithStatus(err error, code int, status, reason string) error {
 	return &Cause{
 		code:    code,
-		domain:  domain,
 		status:  status,
 		message: err,
 		details: []Detail{
 			{
-				Domain:  domain,
 				Reason:  reason,
 				Message: err.Error(),
 			},
@@ -210,7 +197,6 @@ func (c *Cause) Append(e error) {
 		return
 	}
 	c.details = append(c.details, Detail{
-		Domain:  c.domain,
 		Reason:  StatusBackendError,
 		Message: e.Error(),
 	})
@@ -221,7 +207,6 @@ func (c *Cause) MarshalJSON() ([]byte, error) {
 	return json.Marshal(jsonResponse{
 		Error: jsonResponseElement{
 			Code:    c.code,
-			Domain:  c.domain,
 			Status:  c.status,
 			Message: c.message.Error(),
 			Details: c.details,
@@ -237,7 +222,6 @@ func (c *Cause) UnmarshalJSON(b []byte) (err error) {
 	}
 	ce := &Cause{
 		code:    je.Error.Code,
-		domain:  je.Error.Domain,
 		status:  je.Error.Status,
 		message: errors.New(je.Error.Message),
 		details: je.Error.Details,
@@ -255,12 +239,11 @@ func (c *Cause) IsZero() bool {
 func (c *Cause) set(e error) {
 	var v *Cause
 	if !errors.As(e, &v) {
-		errors.As(NewCause(e, c.domain, CaseBackendError), &v)
+		errors.As(NewCause(e, CaseBackendError), &v)
 	}
 
 	// c = v <== fail staticcheck. SA4006: this value of `c` is never used
 	c.code = v.code
-	c.domain = v.domain
 	c.status = v.status
 	c.message = v.message
 	c.details = v.details
