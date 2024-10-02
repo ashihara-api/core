@@ -156,7 +156,7 @@ func NewCause(err error, c ErrCase) error {
 }
 
 // NewCauseWithStatus ...
-func NewCauseWithStatus(err error, code int, status string, reason string) error {
+func NewCauseWithStatus(err error, code int, status, reason string) error {
 	return &Cause{
 		code:    code,
 		status:  status,
