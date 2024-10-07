@@ -19,8 +19,6 @@ version-resolver:
     labels:
       - 'patch'
   default: patch
-include-labels:
-  - 'shared'
 exclude-labels:
   - 'skip-changelog'
 template: |
