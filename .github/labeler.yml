@@ -1,0 +1,6 @@
+enhancement:
+  - head-branch: ['^feature/']
+bug:
+  - head-branch: ['^fix/', '^hotfix/']
+skip-changelog:
+  - head-branch: ['^release/']
